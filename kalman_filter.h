@@ -64,6 +64,12 @@ public:
    */
   void UpdateEKF(const Eigen::VectorXd &z);
 
+  /**
+   * Updates the same code of KF and EKF
+   * @param y the difference between measured value and predicted value
+   **/
+  void UpdateCommon(const Eigen::VectorXd &y);
+
 };
 
 #endif /* KALMAN_FILTER_H_ */
