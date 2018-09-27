@@ -89,6 +89,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       /**
       Convert radar from polar to cartesian coordinates and initialize state.
       */
+      cout << "Radar data!" << endl;
 
       float ro = measurement_pack.raw_measurements_[0];
       float theta = measurement_pack.raw_measurements_[1];
@@ -100,7 +101,6 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       /**
       Initialize state.
       */
-
       ekf_.x_ << measurement_pack.raw_measurements_[0], measurement_pack.raw_measurements_[1], 0, 0;
     }
 
@@ -157,7 +157,17 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     ekf_.H_ = Hj_;
     ekf_.R_ = R_radar_;
 
+    std::ofstream Radar("/home/xiefeng/data/radar.txt", std::ios::app);
+    Radar << "ro: " << std::fixed << measurement_pack.raw_measurements_[0] << "\t"
+          << "theta: " << std::fixed << measurement_pack.raw_measurements_[1] << "\t"
+          << "ro_dot: " << std::fixed << measurement_pack.raw_measurements_[2] << endl;
+    Radar << std::endl;
+
     ekf_.UpdateEKF(measurement_pack.raw_measurements_);
+
+    std::ofstream FilterRadar("/home/xiefeng/data/FilterRadar.txt", std::ios::app);
+    FilterRadar << std::fixed << ekf_.x_ << "\t" << endl;
+    FilterRadar << endl;
   } else {
     // Laser updates
     H_laser_ << 1, 0, 0, 0,
@@ -165,7 +175,16 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     ekf_.H_ = H_laser_;
     ekf_.R_ = R_laser_;
 
+    std::ofstream Laser("/home/xiefeng/data/laser.txt", std::ios::app);
+    Laser << "px: " << std::fixed << measurement_pack.raw_measurements_[0] << "\t"
+          << "py: " << std::fixed << measurement_pack.raw_measurements_[1] << endl;
+    Laser << endl;
+
     ekf_.Update(measurement_pack.raw_measurements_);
+
+    std::ofstream FilterLaser("/home/xiefeng/data/FilterLaser.txt", std::ios::app);
+    FilterLaser << std::fixed << ekf_.x_ << "\t" << endl;
+    FilterLaser << endl;
   }
 
   // print the output
